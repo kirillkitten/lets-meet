@@ -8,18 +8,18 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1088480483155:android:9d97061e38ee925efaf3a6",
+        "mobilesdk_app_id": "1:1088480483155:android:a2eb11fbcea30283faf3a6",
         "android_client_info": {
-          "package_name": "tech.kirillkitten.findme"
+          "package_name": "com.github.kirillkitten.letsmeet"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1088480483155-bmp8b8m05uf95kpo5n2k8qir7mhb209o.apps.googleusercontent.com",
+          "client_id": "1088480483155-87bi2ag892of3bbft9ldf5rvn8ptkvvp.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "tech.kirillkitten.findme",
-            "certificate_hash": "aad17587bb64c78e32241eca7596b4c5feb37963"
+            "package_name": "com.github.kirillkitten.letsmeet",
+            "certificate_hash": "f9870e92bdd8c380d569839c30589af25a4fc17a"
           }
         },
         {
