@@ -21,9 +21,11 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="32dp"
+            android:background="@android:color/transparent"
             android:src="@drawable/ic_location_user"
             map:layout_constraintEnd_toEndOf="parent"
-            map:layout_constraintBottom_toBottomOf="parent"/>
+            map:layout_constraintBottom_toBottomOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
