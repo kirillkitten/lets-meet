@@ -1,15 +1,16 @@
 package com.github.kirillkitten.letsmeet
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
+import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -17,6 +18,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
+import timber.log.Timber
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -27,6 +29,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private var location: Location? = null
+
+    private val locationRequest: LocationRequest by lazy {
+        LocationRequest.create().apply {
+            interval = 1000
+            fastestInterval = 500
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+    }
+
+    private val locationCallback: LocationCallback by lazy {
+        object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult?) {
+                locationResult ?: return
+                val latitude = locationResult.lastLocation.latitude
+                val longitude = locationResult.lastLocation.longitude
+                val bearing = locationResult.lastLocation.bearing
+                Timber.d("Location - $latitude, $longitude, bearing - $bearing")
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,11 +126,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
        }
     }
 
+    @SuppressLint("MissingPermission")
     private fun fetchUserLocation() {
         locationClient.lastLocation.addOnSuccessListener {
             location = it
             moveToUser()
         }
+
+        locationClient.requestLocationUpdates(
+            locationRequest, locationCallback, Looper.getMainLooper()
+        )
     }
 
     companion object {
