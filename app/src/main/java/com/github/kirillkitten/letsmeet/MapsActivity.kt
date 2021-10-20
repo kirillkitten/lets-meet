@@ -15,10 +15,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.MarkerOptions
-import timber.log.Timber
+import com.google.android.gms.maps.model.*
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -29,11 +26,32 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private var location: Location? = null
+        set(value) {
+            if (value == null) return
+            val latitude = value.latitude
+            val longitude = value.longitude
+            val bearing = value.bearing
+
+            val position = LatLng(latitude, longitude)
+            if (userMarker == null) {
+                map?.addMarker(
+                    MarkerOptions()
+                        .position(position)
+                        .rotation(bearing)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.round_navigation_white_24))
+                ).also { userMarker = it }
+            } else {
+                userMarker?.position = position
+                userMarker?.rotation = bearing
+            }
+
+            field = value
+        }
 
     private val locationRequest: LocationRequest by lazy {
         LocationRequest.create().apply {
-            interval = 1000
-            fastestInterval = 500
+            interval = 33
+            fastestInterval = 16
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
     }
@@ -41,14 +59,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private val locationCallback: LocationCallback by lazy {
         object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
-                locationResult ?: return
-                val latitude = locationResult.lastLocation.latitude
-                val longitude = locationResult.lastLocation.longitude
-                val bearing = locationResult.lastLocation.bearing
-                Timber.d("Location - $latitude, $longitude, bearing - $bearing")
+                location = locationResult?.lastLocation
             }
         }
     }
+
+    private var userMarker: Marker? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +96,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val longitude = location?.longitude ?: return
 
         val position = LatLng(latitude, longitude)
-        map?.addMarker(MarkerOptions().position(position).title("User"))
+//        map?.addMarker(MarkerOptions().position(position).title("User"))
         map?.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 17f))
     }
 
@@ -115,15 +131,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-       if (requestCode == LOCATION_PERMISSION_REQUEST) {
-           if (grantResults.getOrNull(0) == PackageManager.PERMISSION_GRANTED) {
-               fetchUserLocation()
-           } else {
-               TODO("Handle permission deny")
-           }
-       } else {
-           super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-       }
+        if (requestCode == LOCATION_PERMISSION_REQUEST) {
+            if (grantResults.getOrNull(0) == PackageManager.PERMISSION_GRANTED) {
+                fetchUserLocation()
+            } else {
+                TODO("Handle permission deny")
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        }
     }
 
     @SuppressLint("MissingPermission")
